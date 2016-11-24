@@ -48,6 +48,7 @@ LOCAL_APPS = (
     # custom users app
     'cookie_cutter_demo.users.apps.UsersConfig',
     # Your stuff: custom apps go here
+    'geodata',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
