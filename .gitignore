@@ -3,6 +3,8 @@
 .AppleDouble
 .LSOverride
 
+dhparams.pem
+
 ### SublimeText ###
 # cache files for sublime text
 *.tmlanguage.cache

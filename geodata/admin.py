@@ -4,4 +4,7 @@ from django.contrib.gis import admin
 
 from .models import Location
 
-admin.site.register(Location, admin.GeoModelAdmin)
+class olGeoModelAdmin(admin.GeoModelAdmin):
+    openlayers_url = 'OpenLayers.js'
+
+admin.site.register(Location, olGeoModelAdmin)

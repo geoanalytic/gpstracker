@@ -13,7 +13,7 @@ if [ -z "$POSTGRES_USER" ]; then
     export POSTGRES_USER=postgres
 fi
 
-export DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
+export DATABASE_URL=postgis://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB
 
 
 function postgres_ready(){

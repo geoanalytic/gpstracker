@@ -6,7 +6,7 @@ volumes:
 
 services:
   postgres:
-    build: ./compose/postgres
+    build: ./compose/docker-postgis
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - postgres_backup:/backups
@@ -27,14 +27,13 @@ services:
     build: ./compose/nginx
     depends_on:
       - django
-
       - certbot
 
     ports:
       - "0.0.0.0:80:80"
 
     environment:
-      - MY_DOMAIN_NAME=demo.positionbot.com
+      - MY_DOMAIN_NAME=dev.positionbot.com
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -44,7 +43,7 @@ services:
 
   certbot:
     image: quay.io/letsencrypt/letsencrypt
-    command: bash -c "sleep 6 && certbot certonly -n --standalone -d demo.positionbot.com --text --agree-tos --email dcurrie@geoanalytic.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
+    command: bash -c "sleep 6 && certbot certonly -n --standalone -d dev.positionbot.com --text --agree-tos --staging --email dcurrie@geoanalytic.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
     entrypoint: ""
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
