@@ -19,3 +19,33 @@ Issues with the above approach:
 4. Undocumented: No mention in the documentation, or it's too hard for me to find
 */
 $('.form-group').removeClass('row');
+
+      var dataurl = '/geodata/data.geojson';   
+      var trackurl = '/geodata/track.geojson';   
+      window.addEventListener("map:init", function (event) {
+        var map = event.detail.map;
+        // Download GeoJSON data with Ajax
+        fetch(dataurl)
+          .then(function(resp) {
+            return resp.json();
+          })
+          .then(function(data) {
+            L.geoJson(data, {
+              onEachFeature: function onEachFeature(feature, layer) {
+                var props = feature.properties;
+                var content = `<h3>${props.name}</h3>`;
+                layer.bindPopup(content);
+            }}).addTo(map);
+          }); 
+        // Download track data too  
+        fetch(trackurl)
+          .then(function(resp) {
+            return resp.json();
+          })
+          .then(function(data) {
+            L.geoJson(data, {
+              onEachFeature: function onEachFeature(feature, layer) {
+                var props = feature.properties;
+            }}).addTo(map);
+          });        
+      });

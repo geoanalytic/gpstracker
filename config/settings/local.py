@@ -24,7 +24,7 @@ TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
 SECRET_KEY = env('DJANGO_SECRET_KEY', default=')dn9dfz5+cidys-26!^i9d6_ku3b&co&)*90791j+@y30=zs&q')
-ALLOWED_HOSTS = ['138.197.131.112']
+ALLOWED_HOSTS = ['webtest.positionbot.com']
 # Mail settings
 # ------------------------------------------------------------------------------
 

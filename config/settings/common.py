@@ -41,6 +41,7 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
+    'leaflet', # django-leaflet
 )
 
 # Apps specific for this project go here.
@@ -76,6 +77,7 @@ MIGRATION_MODULES = {
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = env.bool('DJANGO_DEBUG', False)
+# DEBUG = True
 
 # FIXTURE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -255,3 +257,23 @@ ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+# Settings for Django-leaflet -- see https://github.com/makinacorpus/django-leaflet
+LEAFLET_CONFIG = {
+#    'SPATIAL_EXTENT': (5.0, 44.0, 7.5, 46),
+    'DEFAULT_CENTER': (51.0, -114.0),
+    'DEFAULT_ZOOM': 10,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+    'TILES': [('OpenStreetMap', 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {'attribution': '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>', 'maxZoom': 19}),
+              ('Toner', 'http://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {'attribution': 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+					'<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+					'Map data {attribution.OpenStreetMap}','maxZoom': 20 }),
+			  ('Terrain', 'http://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {'attribution': 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+					'<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+					'Map data {attribution.OpenStreetMap}','maxZoom': 18 })		],
+          
+    'SCALE': 'both',
+    'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
+    'MINIMAP': True,
+#    'NO_GLOBALS' = False,
+}
