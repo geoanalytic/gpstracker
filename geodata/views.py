@@ -19,6 +19,7 @@ from .forms import Gpslocationform
 def geojsonFeedLocation(request):
     return HttpResponse(serialize('geojson', Location.objects.all(),fields=('name','mpoint')))
 
+# Views relating to Gps Tracker locations
 # A track request should include a valid coordinate plus some optional data
 # use a logger for debugging the messages
 logger = logging.getLogger(__name__)
@@ -56,7 +57,11 @@ def geojsonFeed(request):
 # Track serializer
 def geojsonTrack(request):
     last_session = Gpslocation.objects.latest('gpstime').sessionid
-    session = Gpslocation.objects.filter(sessionid__startswith=last_session).order_by('-gpstime')
+    if last_session:
+        session = Gpslocation.objects.filter(sessionid__startswith=last_session).order_by('-gpstime')
 #    session=Gpslocation.objects.order_by('sessionid','-gpstime').distinct('sessionid')
-    line=LineString([s.mpoint for s in session])
-    return HttpResponse(line.geojson)
+        if session:
+            line=LineString([s.mpoint for s in session])
+            return HttpResponse(line.geojson)
+    else:
+        return HttpResponse('')
