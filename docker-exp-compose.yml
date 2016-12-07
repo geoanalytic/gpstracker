@@ -44,7 +44,7 @@ services:
   nginx:
     build: 
       context: ./compose/nginx
-      dockerfile: Dockerfile_dev
+      dockerfile: Dockerfile-dev
     depends_on:
       - django
       - rstudio
@@ -54,7 +54,7 @@ services:
       - "0.0.0.0:80:80"
 
     environment:
-      - MY_DOMAIN_NAME=positionbot.com
+      - MY_DOMAIN_NAME=webtest.positionbot.com
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -64,7 +64,7 @@ services:
 
   certbot:
     image: quay.io/letsencrypt/letsencrypt
-    command: bash -c "sleep 6 && certbot certonly -n --standalone -d positionbot.com -d www.positionbot.com -d test.positionbot.com --text --agree-tos --email info@geoanalytic.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
+    command: bash -c "sleep 6 && certbot certonly -n --standalone -d webtest.positionbot.com  --text --agree-tos --email info@geoanalytic.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
     entrypoint: ""
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
