@@ -4,6 +4,9 @@
 .LSOverride
 
 dhparams.pem
+rstudio.env
+rstudio/
+dave/
 
 ### SublimeText ###
 # cache files for sublime text
