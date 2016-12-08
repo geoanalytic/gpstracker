@@ -22,7 +22,7 @@ Quick Start - Production
 ------------------------
 
 1.  Clone this repository
-2.  Copy env.example to .env and fill in your passwords, etc...
+2.  Copy env.example to .env and change the secret key, add your domain name to ALLOWED_HOSTS
 3.  Copy compose/nginx/dhparams.example.pem to compose/nginx/dhparams.pem and then generate a new set of keys::
 
     $ openssl dhparam -out /home/dave/cc_demo/cookie_cutter_demo/compose/nginx/dhparams.pem 2048
