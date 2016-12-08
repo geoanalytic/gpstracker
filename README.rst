@@ -24,12 +24,12 @@ Quick Start - Production
 1.  Clone this repository
 2.  Copy env.example to .env and fill in your passwords, etc...
 3.  Edit docker-compose.yml and ensure all domain names and email addresses are correct
-4.  Build and run the containers
+4.  Build and run the containers::
 
     $ docker-compose build
     $ docker-compose up -d
     
-5.  Create a superuser
+5.  Create a superuser::
 
     $ docker-compose run django python manage.py createsuperuser
     
@@ -42,17 +42,17 @@ Quick Start - Development
 
 1.  Repeat steps (1) through (2) from the production instructions 
 2.  Edit docker-exp-compose.yml and ensure all domain names and email addresses are correct
-3.  Create a file called rstudio.env and put your credentials in
+3.  Create a file called rstudio.env and put your credentials in::
 
     USER=rstudio_user_name
     PASSWORD=my_super_secret_password
 
-4.  Build and run the containers
+4.  Build and run the containers::
 
     $ docker-compose -f docker-exp-compose.yml build
     $ docker-compose -f docker-exp-compose.yml up -d
     
-5.  Migrate the database, collect static resources and create superuser
+5.  Migrate the database, collect static resources and create superuser::
 
     $ docker-compose -f docker-exp-compose.yml run django python manage.py makemigrations
     $ docker-compose -f docker-exp-compose.yml run django python manage.py migrate
