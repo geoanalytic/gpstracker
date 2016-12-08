@@ -69,7 +69,7 @@ Quick Start - Development w/o HTTPS
 If you don't have a domain name or don't want to bother with encryption, you can run the development server over HTTP.
 
 1. Clone this repository
-2. Create and run the containers
+2. Create and run the containers::
 
     $ docker-compose -f dev.yml build
     $ docker-compose -f dev.yml up -d
@@ -86,13 +86,17 @@ If you don't have a domain name or don't want to bother with encryption, you can
 Using GPS Tracker
 -----------------
 
+Access the phone app from the `play store`_.
+
+.. _`play store`: https://play.google.com/store/apps/details?id=com.websmithing.gpstracker
+
 Once you have a working website::
 
-- install GPS Tracker from the `play`_/app store on your phone.
+- install GPS Tracker from the play/app store on your phone.
 - enter MY_DOMAIN_NAME/geodata/tracker for a target address
 - view your positions on the website
 
-.. _`play`: https://play.google.com/store/apps/details?id=com.websmithing.gpstracker
+
 
 Docker
 ^^^^^^
