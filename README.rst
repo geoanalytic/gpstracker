@@ -88,10 +88,11 @@ Using GPS Tracker
 
 Once you have a working website::
 
-- install `GPS Tracker from the play/app store`_ on your phone.
-.. _GPS Tracker from the play/app store: https://play.google.com/store/apps/details?id=com.websmithing.gpstracker
+- install GPS Tracker from the `play`_/app store on your phone.
 - enter MY_DOMAIN_NAME/geodata/tracker for a target address
 - view your positions on the website
+
+.. _`play`: https://play.google.com/store/apps/details?id=com.websmithing.gpstracker
 
 Docker
 ^^^^^^
