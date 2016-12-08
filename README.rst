@@ -23,24 +23,28 @@ Quick Start - Production
 
 1.  Clone this repository
 2.  Copy env.example to .env and fill in your passwords, etc...
-3.  Edit docker-compose.yml and ensure all domain names and email addresses are correct
-4.  Build and run the containers::
+3.  Copy compose/nginx/dhparams.example.pem to compose/nginx/dhparams.pem and then generate a new set of keys::
+
+    $ openssl dhparam -out /home/dave/cc_demo/cookie_cutter_demo/compose/nginx/dhparams.pem 2048
+    
+4.  Edit docker-compose.yml and ensure all domain names and email addresses are correct
+5.  Build and run the containers::
 
     $ docker-compose build
     $ docker-compose up -d
     
-5.  Create a superuser::
+6.  Create a superuser::
 
     $ docker-compose run django python manage.py createsuperuser
     
-6.  Access your django website at the location you specified as MY_DOMAIN_NAME in (3) above
-7.  Access the django admin at the address you specified as DJANGO_ADMIN_URL in .env
+7.  Access your django website at the location you specified as MY_DOMAIN_NAME in (3) above
+8.  Access the django admin at the address you specified as DJANGO_ADMIN_URL in .env
 
 
 Quick Start - Development w HTTPS
 ---------------------------------
 
-1.  Repeat steps (1) through (2) from the production instructions 
+1.  Repeat steps (1) and (3) from the production instructions 
 2.  Edit docker-exp-compose.yml and ensure all domain names and email addresses are correct
 3.  Create a file called rstudio.env and put your credentials in::
 
@@ -104,5 +108,6 @@ Docker
 See detailed `cookiecutter-django Docker documentation`_.
 
 .. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
+
 
 
