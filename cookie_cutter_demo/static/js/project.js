@@ -33,7 +33,7 @@ $('.form-group').removeClass('row');
             L.geoJson(data, {
               onEachFeature: function onEachFeature(feature, layer) {
                 var props = feature.properties;
-                var content = `<h3>${props.name}</h3>`;
+                var content = `<h3>${props.username}</h3>`;
                 layer.bindPopup(content);
             }}).addTo(map);
           }); 
