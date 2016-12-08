@@ -37,8 +37,8 @@ Quick Start - Production
 7.  Access the django admin at the address you specified as DJANGO_ADMIN_URL in .env
 
 
-Quick Start - Development
--------------------------
+Quick Start - Development w HTTPS
+---------------------------------
 
 1.  Repeat steps (1) through (2) from the production instructions 
 2.  Edit docker-exp-compose.yml and ensure all domain names and email addresses are correct
@@ -63,6 +63,34 @@ Quick Start - Development
 7.  Access the django admin at /admin
 8.  Access the Rstudio interface at /rstudio  
 
+Quick Start - Development w/o HTTPS
+-----------------------------------
+
+If you don't have a domain name or don't want to bother with encryption, you can run the development server over HTTP.
+
+1. Clone this repository
+2. Create and run the containers
+
+    $ docker-compose -f dev.yml build
+    $ docker-compose -f dev.yml up -d
+    
+3.  Migrate the database, collect static resources and create superuser::
+
+    $ docker-compose -f dev.yml run django python manage.py makemigrations
+    $ docker-compose -f dev.yml run django python manage.py migrate
+    $ docker-compose -f dev.yml run django python manage.py collectstatic
+    $ docker-compose -f dev.yml run django python manage.py createsuperuser
+    
+4.  Access your django website at http://localhost:8000
+
+Using GPS Tracker
+-----------------
+
+Once you have a working website::
+
+- install GPS Tracker from the play/app store on your phone.
+- enter MY_DOMAIN_NAME/geodata/tracker for a target address
+- view your positions on the website
 
 Docker
 ^^^^^^
