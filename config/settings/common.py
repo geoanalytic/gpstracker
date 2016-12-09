@@ -276,4 +276,10 @@ LEAFLET_CONFIG = {
     'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
     'MINIMAP': True,
 #    'NO_GLOBALS' = False,
+    'PLUGINS': {
+        'name-of-plugin': {
+            'js': 'js/leaflet-realtime.min.js',
+            'auto-include': True,
+        },
+    },
 }

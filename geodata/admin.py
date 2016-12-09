@@ -2,7 +2,7 @@ from django.contrib.gis import admin
 
 # Register your models here.
 
-from .models import Location, Gpslocation
+from .models import Location, Gpslocation, Device
 
 # subclass the GeoModelAdmin to use the locally hosted OpenLayers library
 class olGeoModelAdmin(admin.GeoModelAdmin):
@@ -18,3 +18,4 @@ class olOSMGeoAdmin(admin.OSMGeoAdmin):
 # the OSMGeoAdmin tool uses the openstreetmap data for a nicer experience
 admin.site.register(Location, olOSMGeoAdmin)
 admin.site.register(Gpslocation, olOSMGeoAdmin)
+admin.site.register(Device)

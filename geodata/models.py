@@ -4,6 +4,7 @@ from datetime import datetime
 import pytz
 from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.gis.db import models
+from cookie_cutter_demo.users.models import User
 
 # A simple point location with a name
 @python_2_unicode_compatible
@@ -41,3 +42,13 @@ class Gpslocation(models.Model):
     # Returns the string representation of the model.
     def __str__(self):              # __unicode__ on Python 2
         return ' '.join([self.username,self.gpstime.strftime('%Y-%m-%d %H:%M')])
+
+# A table to link devices to users
+@python_2_unicode_compatible
+class Device(models.Model):
+    owner = models.ForeignKey(User)
+    phonenumber = models.CharField(max_length=50)
+    
+    def __str__(self):    # __unicode__ on Python 2
+        return ' '.join([self.owner.username, self.phonenumber])
+    
