@@ -46,8 +46,11 @@ class Gpslocation(models.Model):
 # A table to link devices to users
 @python_2_unicode_compatible
 class Device(models.Model):
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True,null=True)
     phonenumber = models.CharField(max_length=50)
+    
+    class Meta:
+      unique_together=("owner", "phonenumber")
     
     def __str__(self):    # __unicode__ on Python 2
         return ' '.join([self.owner.username, self.phonenumber])

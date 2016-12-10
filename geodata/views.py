@@ -12,7 +12,7 @@ from urllib.parse import unquote
 from datetime import datetime
 from django.contrib.gis.geos import Point, LineString
 
-from .models import Location, Gpslocation
+from .models import Location, Gpslocation, Device
 from .forms import Gpslocationform
 
 # Geojson serializer for Locations
@@ -21,6 +21,7 @@ def geojsonFeedLocation(request):
 
 # Views relating to Gps Tracker locations
 # A track request should include a valid coordinate plus some optional data
+# Currently this function will throw an error because the timestamp does not specify a timezone 
 # use a logger for debugging the messages
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,10 @@ def track(request):
         track_data = Gpslocationform(request.GET)
         if track_data.is_valid():
             track_point = track_data.save(commit=False)
+            # create a GEOS point feature from the reported coordinates
             track_point.mpoint = Point(track_data.cleaned_data['longitude'], track_data.cleaned_data['latitude'])
+            # currently getting naive timestamps, which will be converted to fake UTC using the timezone of the server
+            # how to fix this?  Really should modify the phone app
             track_point.gpstime = datetime.strptime(unquote(track_data.cleaned_data['date']),'%Y-%m-%d+%H:%M:%S')
             track_point.save()
         else:
