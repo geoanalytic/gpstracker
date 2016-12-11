@@ -36,6 +36,8 @@ def track(request):
             # currently getting naive timestamps, which will be converted to fake UTC using the timezone of the server
             # how to fix this?  Really should modify the phone app
             track_point.gpstime = datetime.strptime(unquote(track_data.cleaned_data['date']),'%Y-%m-%d+%H:%M:%S')
+            # get or create the device_id key
+            track_point.device_id, created = Device.objects.get_or_create(phonenumber = track_data.cleaned_data['phonenumber'])
             track_point.save()
         else:
             logger.error('Failed to validate track data')
@@ -49,7 +51,7 @@ def track(request):
 def geojsonFeed(request):
     return HttpResponse(serialize('geojson', 
                         Gpslocation.objects.order_by('phonenumber','-gpstime').distinct('phonenumber'), 
-                        geometry_field='mpoint', fields=('username',)))
+                        geometry_field='mpoint', fields=('username','device_id',)))
                         
 #   return HttpResponse(serialize('geojson', Gpslocation.objects.all(), geometry_field='mpoint', fields=('username',)))
 

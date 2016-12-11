@@ -28,6 +28,7 @@ class Gpslocation(models.Model):
     locationmethod = models.CharField(max_length=50, default='',blank=True)
     username = models.CharField(max_length=50, default='',blank=True)
     phonenumber = models.CharField(max_length=50, default='',blank=True)
+    device_id = models.ForeignKey("Device")
     sessionid = models.CharField(max_length=50, default='',blank=True)
     accuracy = models.IntegerField(default=0)
     extrainfo = models.CharField(max_length=255, default='',blank=True)
@@ -53,5 +54,8 @@ class Device(models.Model):
       unique_together=("owner", "phonenumber")
     
     def __str__(self):    # __unicode__ on Python 2
-        return ' '.join([self.owner.username, self.phonenumber])
+        if(self.owner is None):
+            return ' '.join(['No Owner', self.phonenumber])
+        else:
+            return ' '.join([self.owner.username, self.phonenumber])
     

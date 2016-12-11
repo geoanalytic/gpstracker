@@ -25,18 +25,19 @@ $('.form-group').removeClass('row');
       window.addEventListener("map:init", function (event) {
         var map = event.detail.map;
         // Download GeoJSON data with Ajax
-        fetch(dataurl)
-          .then(function(resp) {
-            return resp.json();
-          })
-          .then(function(data) {
-            L.geoJson(data, {
-              onEachFeature: function onEachFeature(feature, layer) {
-                var props = feature.properties;
-                var content = `<h3>${props.username}</h3>`;
-                layer.bindPopup(content);
-            }}).addTo(map);
-          }); 
+
+        L.realtime({
+              url:  dataurl,
+              crossOrigin: false,
+              type: 'json'},
+              {
+                interval: 3 * 1000,
+                getFeatureId: function(featureData){
+                   return featureData.properties.device_id;
+                }
+              }).addTo(map);
+
+          
         // Download track data too  
         fetch(trackurl)
           .then(function(resp) {
@@ -49,3 +50,4 @@ $('.form-group').removeClass('row');
             }}).addTo(map);
           });        
       });
+
