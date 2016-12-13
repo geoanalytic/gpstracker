@@ -24,8 +24,7 @@ $('.form-group').removeClass('row');
       var trackurl = '/geodata/track.geojson';   
       window.addEventListener("map:init", function (event) {
         var map = event.detail.map;
-        // Download GeoJSON data with Ajax
-
+        // Put realtime markers on the map with a GeoJSON feed
         L.realtime({
               url:  dataurl,
               crossOrigin: false,
@@ -39,15 +38,12 @@ $('.form-group').removeClass('row');
 
           
         // Download track data too  
-        fetch(trackurl)
-          .then(function(resp) {
-            return resp.json();
-          })
-          .then(function(data) {
-            L.geoJson(data, {
-              onEachFeature: function onEachFeature(feature, layer) {
-                var props = feature.properties;
-            }}).addTo(map);
-          });        
+        L.realtime({
+              url:  trackurl,
+              crossOrigin: false,
+              type: 'json'},
+              {
+                interval: 6 * 1000,
+              }).addTo(map);     
       });
 

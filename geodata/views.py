@@ -11,6 +11,8 @@ import logging
 from urllib.parse import unquote
 from datetime import datetime
 from django.contrib.gis.geos import Point, LineString
+from django.contrib.gis.db.models.aggregates import MakeLine
+from django.db.models.aggregates import Min
 
 from .models import Location, Gpslocation, Device
 from .forms import Gpslocationform
@@ -64,10 +66,24 @@ def geojsonFeed(request):
 def geojsonTrack(request):
     last_session = Gpslocation.objects.latest('gpstime').sessionid
     if last_session:
-        session = Gpslocation.objects.filter(sessionid__startswith=last_session).order_by('-gpstime')
-#    session=Gpslocation.objects.order_by('sessionid','-gpstime').distinct('sessionid')
+        session = Gpslocation.objects.filter(sessionid__exact=last_session).order_by('-gpstime')
+
         if session:
+            device = session[0].device_id.id
+            srid = session[0].mpoint.srs.srid
             line=LineString([s.mpoint for s in session])
-            return HttpResponse(line.geojson)
+            linelist=[]
+            linelist.append('{ "type": "Feature", "properties": {"id":"%(id)s"},"geometry":%(linestr)s' % {"id":device,"linestr":line.geojson})
+            result = '{"type": "FeatureCollection",  "features": [' + ",".join(linelist) + '}]}'
+            return HttpResponse(result)
     else:
         return HttpResponse('')
+        
+
+def geojsonTrack2(request):        
+    last_session = Gpslocation.objects.latest('gpstime').sessionid
+    if last_session:
+        session_line = Gpslocation.objects.filter(sessionid__startswith=last_session).aggregate(MakeLine('mpoint'),id=Min('device_id'))
+        return HttpResponse(serialize('geojson', session_line, fields=('username','id',)))
+    else:
+        return HttpResponse('')    
