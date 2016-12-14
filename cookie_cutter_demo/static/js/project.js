@@ -23,9 +23,10 @@ $('.form-group').removeClass('row');
       var dataurl = '/geodata/data.geojson';   
       var trackurl = '/geodata/track.geojson';   
       window.addEventListener("map:init", function (event) {
+        var firstLoad = true
         var map = event.detail.map;
         // Put realtime markers on the map with a GeoJSON feed
-        L.realtime({
+        point_locs = L.realtime({
               url:  dataurl,
               crossOrigin: false,
               type: 'json'},
@@ -38,12 +39,20 @@ $('.form-group').removeClass('row');
 
           
         // Download track data too  
-        L.realtime({
+        point_tracks = L.realtime({
               url:  trackurl,
               crossOrigin: false,
               type: 'json'},
               {
                 interval: 6 * 1000,
               }).addTo(map);     
+              
+        // recenter map on updates...
+        point_tracks.on('update', function() {
+              if (firstLoad){
+                  map.fitBounds(point_tracks.getBounds());
+                  firstLoad = false
+                  }
+              });
       });
 

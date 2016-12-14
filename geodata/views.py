@@ -51,9 +51,12 @@ def track(request):
 
 # Geojson serializer
 def geojsonFeed(request):
-    return HttpResponse(serialize('geojson', 
-                        Gpslocation.objects.order_by('phonenumber','-gpstime').distinct('phonenumber'), 
+    if request.user.is_authenticated:
+        return HttpResponse(serialize('geojson', 
+                        Gpslocation.objects.filter(device_id__owner = request.user).order_by('phonenumber','-gpstime').distinct('phonenumber'), 
                         geometry_field='mpoint', fields=('username','device_id',)))
+    else:
+        return HttpResponse(serialize('geojson',Location.objects.all(), geometry_field='mpoint'))
                         
 #   return HttpResponse(serialize('geojson', Gpslocation.objects.all(), geometry_field='mpoint', fields=('username',)))
 
@@ -64,18 +67,23 @@ def geojsonFeed(request):
 
 # Track serializer
 def geojsonTrack(request):
-    last_session = Gpslocation.objects.latest('gpstime').sessionid
-    if last_session:
-        session = Gpslocation.objects.filter(sessionid__exact=last_session).order_by('-gpstime')
+    if request.user.is_authenticated:    
+        last_session = Gpslocation.objects.filter(device_id__owner = request.user).latest('gpstime').sessionid
+        if last_session:
+            session = Gpslocation.objects.filter(device_id__owner = request.user).filter(sessionid__exact=last_session).order_by('-gpstime')
 
-        if session:
-            device = session[0].device_id.id
-            srid = session[0].mpoint.srs.srid
-            line=LineString([s.mpoint for s in session])
-            linelist=[]
-            linelist.append('{ "type": "Feature", "properties": {"id":"%(id)s"},"geometry":%(linestr)s' % {"id":device,"linestr":line.geojson})
-            result = '{"type": "FeatureCollection",  "features": [' + ",".join(linelist) + '}]}'
-            return HttpResponse(result)
+            if session:
+                device = session[0].device_id.id
+                srid = session[0].mpoint.srs.srid
+                if(session.count() >= 2):
+                    line=LineString([s.mpoint for s in session])
+                else:
+                    line=LineString([session[0].mpoint, session[0].mpoint])
+                
+                linelist=[]
+                linelist.append('{ "type": "Feature", "properties": {"id":"%(id)s"},"geometry":%(linestr)s' % {"id":device,"linestr":line.geojson})
+                result = '{"type": "FeatureCollection",  "features": [' + ",".join(linelist) + '}]}'
+                return HttpResponse(result)
     else:
         return HttpResponse('')
         

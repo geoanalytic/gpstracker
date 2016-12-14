@@ -42,6 +42,7 @@ THIRD_PARTY_APPS = (
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
     'leaflet', # django-leaflet
 )
 

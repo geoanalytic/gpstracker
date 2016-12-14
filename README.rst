@@ -56,7 +56,7 @@ Quick Start - Production
 Quick Start - Development w HTTPS
 ---------------------------------
 
-1.  Repeat steps (1) and (3) from the production instructions 
+1.  Repeat steps (1) and (4) from the production instructions 
 2.  Edit docker-exp-compose.yml and ensure all domain names and email addresses are correct
 3.  Create a file called rstudio.env and put your credentials in::
 
