@@ -28,8 +28,8 @@ services:
       - USE_DOCKER=yes
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     links:
       - postgres
     
@@ -38,8 +38,19 @@ services:
     volumes:
       - .:/home
     env_file: rstudio.env
-    ports:
-      - "8787:8787"
+    expose:
+      - "8787"
+    links:
+      - postgres
+
+  mapserver:
+    build: ./compose/c2c_mapserver
+    volumes:
+      - ./data:/etc/mapserver
+    expose:
+      - "80"
+    links:
+      - postgres
 
   nginx:
     build: 
@@ -54,7 +65,7 @@ services:
       - "0.0.0.0:80:80"
 
     environment:
-      - MY_DOMAIN_NAME=webtest.positionbot.com
+      - MY_DOMAIN_NAME=mapserver.positionbot.com
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -64,7 +75,7 @@ services:
 
   certbot:
     image: quay.io/letsencrypt/letsencrypt
-    command: bash -c "sleep 6 && certbot certonly -n --standalone -d webtest.positionbot.com  --text --agree-tos --email info@geoanalytic.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
+    command: bash -c "sleep 6 && certbot certonly -n --standalone -d mapserver.positionbot.com  --text --agree-tos --email info@geoanalytic.com --server https://acme-v01.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --standalone-supported-challenges http-01"
     entrypoint: ""
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
