@@ -46,7 +46,7 @@ services:
   mapserver:
     build: ./compose/c2c_mapserver
     volumes:
-      - ./data:/etc/mapserver
+      - ./data:/data
     expose:
       - "80"
     links:
