@@ -23,8 +23,8 @@ TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key only used for development and testing.
-SECRET_KEY = env('DJANGO_SECRET_KEY', default=')dn9dfz5+9k8hs-82!^i9d6_kuuy7oo&)*90791j+@y30=zs&q')
-ALLOWED_HOSTS = ['mapserver.positionbot.com']
+SECRET_KEY = env('DJANGO_SECRET_KEY', default=')dn9jk5q+9k8hs-82!^iop&6kuuy7oo&)*88771j+@y30=zs&q')
+ALLOWED_HOSTS = ['webmap.positionbot.com']
 # Mail settings
 # ------------------------------------------------------------------------------
 
