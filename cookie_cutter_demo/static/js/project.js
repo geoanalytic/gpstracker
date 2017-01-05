@@ -23,29 +23,36 @@ $('.form-group').removeClass('row');
       var dataurl = '/geodata/data.geojson';   
       var trackurl = '/geodata/track.geojson';   
       window.addEventListener("map:init", function (event) {
+        var firstLoad = true
         var map = event.detail.map;
-        // Download GeoJSON data with Ajax
-        fetch(dataurl)
-          .then(function(resp) {
-            return resp.json();
-          })
-          .then(function(data) {
-            L.geoJson(data, {
-              onEachFeature: function onEachFeature(feature, layer) {
-                var props = feature.properties;
-                var content = `<h3>${props.username}</h3>`;
-                layer.bindPopup(content);
-            }}).addTo(map);
-          }); 
+        // Put realtime markers on the map with a GeoJSON feed
+        point_locs = L.realtime({
+              url:  dataurl,
+              crossOrigin: false,
+              type: 'json'},
+              {
+                interval: 3 * 1000,
+                getFeatureId: function(featureData){
+                   return featureData.properties.device_id;
+                }
+              }).addTo(map);
+
+          
         // Download track data too  
-        fetch(trackurl)
-          .then(function(resp) {
-            return resp.json();
-          })
-          .then(function(data) {
-            L.geoJson(data, {
-              onEachFeature: function onEachFeature(feature, layer) {
-                var props = feature.properties;
-            }}).addTo(map);
-          });        
+        point_tracks = L.realtime({
+              url:  trackurl,
+              crossOrigin: false,
+              type: 'json'},
+              {
+                interval: 6 * 1000,
+              }).addTo(map);     
+              
+        // recenter map on updates...
+        point_tracks.on('update', function() {
+              if (firstLoad){
+                  map.fitBounds(point_tracks.getBounds());
+                  firstLoad = false
+                  }
+              });
       });
+

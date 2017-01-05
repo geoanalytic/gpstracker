@@ -23,10 +23,38 @@
     <!-- This file stores project-specific CSS -->
     <link href="{% static 'css/project.css' %}" rel="stylesheet">
     <style>
-    .leaflet-container {  /* all maps */
-        width:  100%;
-        height: 600px;
-    }
+body {
+    padding: 0;
+    margin: 0
+}
+
+html,
+body {
+    height: 100%
+}
+.fill-height {
+    min-height: 100%;
+    height:auto !important; /* cross-browser */
+    height: 100%; /* cross-browser */   
+}
+#yourmap
+{
+    width: 100px;
+    height:auto;
+    min-height: 80%;
+    min-width: 100%;
+    display: block;
+}
+.leaflet-container .leaflet-control-attribution {
+	background-color: rgba(255, 255, 255, 0.0);
+
+
+.leaflet-marker-icon, .leaflet-marker-shadow {
+    transition: transform 0.25s ease;
+    -webkit-transition: transform 0.25s ease;
+    -o-transition: transform 0.25s ease;
+    -moz-transition: transform 0.25s ease;
+}
     </style>
     {% endblock %}    
   </head>
@@ -85,9 +113,10 @@
       {% block content %}
         <p>Use this document as a way to quick start any new project.</p>
       {% endblock content %}
-      {% leaflet_map "yourmap" %}
+      
     </div> <!-- /container -->
-
+    {% leaflet_map "yourmap" %}
+    
     {% block modal %}{% endblock modal %}
 
     <!-- Le javascript

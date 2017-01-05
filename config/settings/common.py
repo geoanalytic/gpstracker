@@ -41,6 +41,8 @@ THIRD_PARTY_APPS = (
     'allauth',  # registration
     'allauth.account',  # registration
     'allauth.socialaccount',  # registration
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
     'leaflet', # django-leaflet
 )
 
@@ -264,16 +266,30 @@ LEAFLET_CONFIG = {
     'DEFAULT_ZOOM': 10,
     'MIN_ZOOM': 3,
     'MAX_ZOOM': 18,
-    'TILES': [('OpenStreetMap', 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {'attribution': '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>', 'maxZoom': 19}),
-              ('Toner', 'http://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {'attribution': 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
-					'<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
-					'Map data {attribution.OpenStreetMap}','maxZoom': 20 }),
-			  ('Terrain', 'http://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {'attribution': 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
-					'<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
-					'Map data {attribution.OpenStreetMap}','maxZoom': 18 })		],
+    'TILES': [('OpenStreetMap', 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+                {'attribution': '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>','maxZoom': 19}),
+              ('Toner', 'http://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', 
+                        {'attribution': 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+					              '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+					              'Map data {attribution.OpenStreetMap}','maxZoom': 20 }),
+			        ('Terrain', 'http://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', 
+			                    {'attribution': 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+					                '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+					                'Map data {attribution.OpenStreetMap}','maxZoom': 18 }),
+					    ('OpenCycleMap', 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+					      {'attribution': '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>','maxZoom': 19}),
+					    ('ESRI Topo', 'http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
+					      {'attribution': '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>','maxZoom': 19})
+					     ],
           
     'SCALE': 'both',
     'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
     'MINIMAP': True,
 #    'NO_GLOBALS' = False,
+    'PLUGINS': {
+        'name-of-plugin': {
+            'js': 'js/leaflet-realtime.min.js',
+            'auto-include': True,
+        },
+    },
 }
