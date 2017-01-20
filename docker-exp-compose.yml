@@ -24,6 +24,7 @@ services:
       - USE_DOCKER=yes
     volumes:
       - .:/app
+      - /mnt/volume-sfo2-01/odaa:/data      
     expose:
       - "8000"
     links:
@@ -48,6 +49,17 @@ services:
       - "80"
     links:
       - postgres
+      
+  mapcache:
+    build: ./compose/mapcache
+    volumes:
+      - /mnt/volume-sfo2-01/odaa:/data
+    expose:
+      - "80"
+    links:
+      - mapserver    
+    depends_on:
+      - mapserver
 
   nginx:
     build: 
@@ -57,6 +69,7 @@ services:
       - django
       - rstudio
       - certbot
+      - mapcache
 
     ports:
       - "0.0.0.0:80:80"
