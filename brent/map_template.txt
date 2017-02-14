@@ -1,0 +1,56 @@
+# Mapfile created by R img_to_map:
+MAP
+    PROJECTION                     # Required for WMS services
+        'init=epsg:3857'
+    END
+#    IMAGETYPE      PNG
+    UNITS METERS
+    EXTENT         {{xmin}} {{ymin}} {{xmax}} {{ymax}}
+    SIZE           400 400
+    MAXSIZE        10000           # prevent the pink screen of death on large monitors
+    SHAPEPATH      "."
+    IMAGECOLOR     255 255 255
+    TRANSPARENT    TRUE    
+    WEB 
+        METADATA
+            'ows_title'                  'quickbird'
+            'ows_srs'                    'EPSG:4326 EPSG:3857'
+            'ows_enable_request'         '*'
+            'ows_onlineresource'         'http://webmap.positionbot.com/mapserv/?map=/data/raster/quickbird/{{imagename}}.map'
+             'wms_feature_info_mime_type' 'text/html'
+        END # metadata
+    END # web
+    LEGEND
+        STATUS ON
+        LABEL
+            SIZE 8
+            COLOR 0 0 0
+        END # LABEL
+    END # LEGEND
+	  IMAGETYPE AGG_PNG    
+    OUTPUTFORMAT
+       NAME  'AGG_PNG'
+       DRIVER AGG/PNG
+#        MIMETYPE "image/png;mode=24bit"
+#        IMAGEMODE RGB
+       MIMETYPE "image/png"
+       IMAGEMODE RGBA    # renders IMAGECOLOR transparent
+       EXTENSION "png"
+       FORMATOPTION "INTERLACE=false"
+       FORMATOPTION "TRANSPARENT=ON"
+        TRANSPARENT ON
+        FORMATOPTION "QUANTIZE_FORCE=ON"
+       FORMATOPTION "QUANTIZE_DITHER=off"
+       FORMATOPTION "QUANTIZE_COLORS=256"
+    END # outputformat    
+    LAYER # raster layer begins here
+        NAME         quickbird
+        DATA        '{{imagename}}.TIF'
+        STATUS       ON
+        TYPE         RASTER
+        CLASS
+            NAME 'Quickbird'
+        END # of CLASS
+    END #  raster layer ends here
+    # End of LAYER DEFINITIONS -------------------------------
+END # of map file

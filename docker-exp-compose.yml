@@ -1,5 +1,4 @@
 version: '2'
-
 services:
   postgres:
     build: ./compose/docker-postgis
@@ -9,7 +8,15 @@ services:
     environment:
       - ALLOW_IP_RANGE=172.18.0.0/16
 
-
+  pgadmin:
+    build: ./compose/pgadmin
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - "5050:5050"
+      
   django:
     build:
       context: .
@@ -22,6 +29,8 @@ services:
       - POSTGRES_PASSWORD=docker
       - POSTGRES_DB=gis
       - USE_DOCKER=yes
+      - PROJ_LIB=/usr/share/proj
+      - GDAL_DATA=/usr/share/gdal
     volumes:
       - .:/app
       - /mnt/volume-sfo2-01/odaa:/data      
@@ -70,7 +79,11 @@ services:
       - rstudio
       - certbot
       - mapcache
+      - pgadmin
 
+    links:
+      - pgadmin
+      
     ports:
       - "0.0.0.0:80:80"
 
@@ -82,6 +95,7 @@ services:
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/lib/letsencrypt:/var/lib/letsencrypt
+      - /mnt/volume-sfo2-01/odaa:/data      
 
   certbot:
     image: quay.io/letsencrypt/letsencrypt

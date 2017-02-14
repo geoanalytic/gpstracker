@@ -6,6 +6,11 @@
 dhparams.pem
 rstudio.env
 dave/
+.Rhistory
+.RData
+.cache/
+.rstudio/
+
 
 ### SublimeText ###
 # cache files for sublime text

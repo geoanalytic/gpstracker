@@ -39,7 +39,7 @@ bf_road_arc_mapping = {
 }
 
 class canvec_style_def(models.Model):
-    shortname          = models.CharField(max_length=80)
+    shortname          = models.CharField(max_length=80, primary_key=True)
     category           = models.CharField(max_length=80)
     description        = models.CharField(max_length=250)
     geom_outcolor      = models.CharField(max_length=80)
@@ -54,3 +54,15 @@ class canvec_style_def(models.Model):
     label_fillcolor    = models.CharField(max_length=80)
     label_outcolor     = models.CharField(max_length=80)
     label_height       = models.IntegerField()
+	
+class j_style_altalis20k(models.Model):
+    altalis20k      = models.CharField(max_length=250)
+    nrcan_shortname = models.CharField(max_length=250)
+
+#class v_bf_road_arc(models.Model):
+#    class Meta:
+#        managed = False
+
+class canvec_250k_wooded(models.Model):
+    class Meta:
+        managed = False

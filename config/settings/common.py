@@ -260,21 +260,41 @@ ADMIN_URL = r'^admin/'
 # ------------------------------------------------------------------------------
 # Settings for Django-leaflet -- see https://github.com/makinacorpus/django-leaflet
 LEAFLET_CONFIG = {
-#    'SPATIAL_EXTENT': (5.0, 44.0, 7.5, 46),
-    'DEFAULT_CENTER': (51.0, -114.0),
-    'DEFAULT_ZOOM': 10,
+    'SPATIAL_EXTENT': (-121, 48, -109, 61),
+#    'DEFAULT_CENTER': (56.7, -111.4),  
+#    'DEFAULT_ZOOM': 10,
     'MIN_ZOOM': 3,
-    'MAX_ZOOM': 18,
+    'MAX_ZOOM': 21,
     'TILES': [('OpenStreetMap', 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {'attribution': '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>', 'maxZoom': 19}),
               ('Toner', 'http://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {'attribution': 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
 					'<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
 					'Map data {attribution.OpenStreetMap}','maxZoom': 20 }),
 			  ('Terrain', 'http://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {'attribution': 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
 					'<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
-					'Map data {attribution.OpenStreetMap}','maxZoom': 18 })		],
+					'Map data {attribution.OpenStreetMap}','maxZoom': 18 })
+					],
+    'OVERLAYS': [
+				('Quickbird 2012', 'https://webmap.positionbot.com/mapcache/tms/1.0.0/Quickbird_2012@g/{z}/{x}/{y}.png', {'attribution': 'Image data by <a href="http://digitalglobe.com">DigitalGlobe</a>','maxZoom': 18, 'tms': 'true' }),
+				('Quickbird 2015', 'https://webmap.positionbot.com/mapcache/tms/1.0.0/Quickbird_2015@g/{z}/{x}/{y}.png', {'attribution': 'Image data by <a href="http://digitalglobe.com">DigitalGlobe</a>','maxZoom': 18, 'tms': 'true' }),
+#				('DIDs+',          'https://webmap.positionbot.com//mapserv/?map=/data/mapfiles/didsplus/didsplus.map&', {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 21, 'wms': 'true' }),
+#				('Cadastral',      'https://webmap.positionbot.com/mapcache/tms/1.0.0/Cadastral@g21/{z}/{x}/{y}.png', {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 21, 'tms': 'true' }),
+				('Basemap',        'https://webmap.positionbot.com/mapcache/tms/1.0.0/AltaLIS_20k@g/{z}/{x}/{y}.png', {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 18, 'tms': 'true' })
+					],
           
     'SCALE': 'both',
     'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
     'MINIMAP': True,
+	'RESET_VIEW' : True,
 #    'NO_GLOBALS' = False,
+	'PLUGINS': {
+		'MousePosition': {
+			'css':'/static/css/L.Control.MousePosition.css',
+			'js': '/static/js/L.Control.MousePosition.js',
+			'auto-include': True,
+		},
+		'BetterWMS': {
+			'js': '/static/js/L.TileLayer.BetterWMS.js',
+			'auto-include': True,
+		},
+	},
 }

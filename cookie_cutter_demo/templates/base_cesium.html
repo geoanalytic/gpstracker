@@ -1,0 +1,155 @@
+{% load staticfiles i18n %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <meta name="author" content="GeoAnalytic Inc.">
+  <title>{% block title %}OpenDataAreas Alberta - Cesium{% endblock title %}</title>
+  
+  {% block css %}  
+  <style>
+      @import url(../static/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+  {% endblock %} 
+  <script src="{% static 'Cesium/Cesium.js'  %}"></script>
+  
+</head>
+
+<body>
+  {% block modal %}{% endblock modal %}
+
+  <div id="cesiumContainer"></div>
+  
+  {% block javascript %}
+  <script>
+	Cesium.BingMapsApi.defaultKey = 'AljFLH_6YezKaiGd34UEx6D-c7E_99nPn7YUADjjxC-uowfxxzn1eqL-VNh-Et7m';
+	Cesium.MapboxApi.defaultAccessToken = 'pk.eyJ1IjoiYmZyYXNlciIsImEiOiJjaXlvdGlyNmgwMDJxMzNwY3U0bHMyaWg3In0.ygo6W32G7HaiVfRkBa2xFQ';
+
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        animation:            true,
+        baseLayerPicker:      true,
+        fullscreenButton:     true,
+        vrButton:             false,
+        geocoder:             false,
+        homeButton:           true,
+        infoBox:              true,
+        sceneModePicker:      true,
+        selectionIndicator:   true,
+        timeline:             true,
+        navigationHelpButton: true,
+        navigationInstructionsInitiallyVisible: true,
+        scene3DOnly:          false,
+		shadows:              false,
+
+//		selectedImageryProviderViewModel 	<object>
+//		imageryProviderViewModels			array of <object>
+//		selectedTerrainProviderViewModel	<object>
+//		terrainProviderViewModels			array of <object>
+//		imageryProvider						<object>
+//		terrainProvider						<object>
+//		skyBox:               				<object>
+//		skyAtmosphere:        				<object>
+//		fullscreenElement
+//		useDefaultRenderLoop
+//		targetFrameRate
+//		showRenderLoopErrors
+//		automaticallyTrackDataSourceClocks
+//		contextOptions
+//		sceneMode
+//		mapProjection
+//		globe
+//		orderIndependentTranslucency
+//		creditContainer
+//		dataSources
+//		terrainShadows
+//		mapMode2D
+
+        terrainExaggeration:  1.0
+    });
+	//----------------------------------------------------
+	// Custom Terrain
+	//----------------------------------------------------
+	var terrainProvider = new Cesium.CesiumTerrainProvider({
+        url : '/data/terrains/Beaverhills_be_geo/'
+    });	
+    viewer.terrainProvider = terrainProvider;	
+    viewer.scene.globe.enableLighting = true;
+	
+	//----------------------------------------------------
+	// Other Imagery, data
+	//----------------------------------------------------
+    var imageryLayers = viewer.imageryLayers;
+
+/*
+	// Add a TMS imagery layer
+	imageryLayers.addImageryProvider(new Cesium.createTileMapServiceImageryProvider({
+	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/DIDsPlus@g21',
+	   fileExtension: 'png'
+	}));
+*/
+	
+	// Add a WMS imagery layer
+	imageryLayers.addImageryProvider(new Cesium.WebMapServiceImageryProvider({
+		url : 'https://webmap.positionbot.com/mapserv/?map=/data/mapfiles/didsplus/didsplus.map&',
+		//                                             this map file is required? for GetFeature
+		layers : 'DIDsPlus',
+		parameters : {
+			map: '/data/mapfiles/didsplus/didsplus.map',
+			transparent : true,
+//			srs : 'EPSG:3857',
+			format : 'image/png'
+	//        service: 'WMS',
+	//        version:"1.1.1", 
+	//        request:"GetMap", 
+	//        styles:""
+		}
+	}));
+	
+	// Add a TMS imagery layer
+	imageryLayers.addImageryProvider(new Cesium.createTileMapServiceImageryProvider({
+	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/Cadastral@g21',
+	   fileExtension: 'png'
+	}));
+
+	var tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+		url: '/data/entwine/' + 'ftmac-cesium' + '/cesium'
+	}));
+
+	// Add Point Cloud
+	tileset.readyPromise.then(function() {
+		console.log('Loaded tileset');
+		var bounding = tileset._root._boundingVolume;
+		var center = bounding.boundingSphere.center;
+		var cart = Cesium.Ellipsoid.WGS84.cartesianToCartographic(center);
+
+		var dest = Cesium.Cartesian3.fromDegrees(
+				cart.longitude * (180 / Math.PI),
+				cart.latitude * (180 / Math.PI),
+				bounding._boundingSphere.radius * 2.2);
+
+		viewer.camera.setView({ destination: dest });
+	});	
+	
+	//----------------------------------------------------
+	// Add basic drag and drop functionality
+	//----------------------------------------------------
+	// CZML,KML,KMZ files:
+	viewer.extend(Cesium.viewerDragDropMixin, { clearOnDrop : false });
+
+	//Show a pop-up alert if we encounter an error when processing a dropped file
+	viewer.dropError.addEventListener(function(dropHandler, name, error) {
+		console.log(error);
+		window.alert(error);
+	});
+
+  </script>
+  {% endblock javascript %} 
+</body>
+</html>

@@ -4,6 +4,7 @@ from django.contrib.gis import admin
 
 from .models import bf_road_arc
 from .models import canvec_style_def
+from .models import j_style_altalis20k
 
 # subclass the GeoModelAdmin to use the locally hosted OpenLayers library
 class olGeoModelAdmin(admin.GeoModelAdmin):
@@ -20,3 +21,4 @@ class olOSMGeoAdmin(admin.OSMGeoAdmin):
 admin.site.register(bf_road_arc, olOSMGeoAdmin)
 
 admin.site.register(canvec_style_def)
+admin.site.register(j_style_altalis20k)
