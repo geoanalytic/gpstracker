@@ -19,6 +19,12 @@ class bf_road_arc(models.Model):
     shape_st_2 = models.FloatField()
     objectid = models.IntegerField()
     geom = models.MultiLineStringField(srid=4269)
+    
+    class Meta:
+      ordering = ['feature_ty','name']
+      
+    def __str__(self):
+      return ' '.join([self.feature_ty,self.name])
 
 # Auto-generated `LayerMapping` dictionary for BF_ROAD_ARC model
 bf_road_arc_mapping = {
@@ -54,11 +60,23 @@ class canvec_style_def(models.Model):
     label_fillcolor    = models.CharField(max_length=80)
     label_outcolor     = models.CharField(max_length=80)
     label_height       = models.IntegerField()
-	
+
+    class Meta:
+      ordering = ['category','shortname']
+      
+    def __str__(self):
+      return ' '.join([self.category,self.shortname])
+      
 class j_style_altalis20k(models.Model):
     altalis20k      = models.CharField(max_length=250)
     nrcan_shortname = models.CharField(max_length=250)
 
+    class Meta:
+      ordering = ['nrcan_shortname','altalis20k']
+      
+    def __str__(self):
+      return ' '.join([self.nrcan_shortname,self.altalis20k])
+      
 #class v_bf_road_arc(models.Model):
 #    class Meta:
 #        managed = False

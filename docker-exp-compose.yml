@@ -8,14 +8,15 @@ services:
     environment:
       - ALLOW_IP_RANGE=172.18.0.0/16
 
-  pgadmin:
-    build: ./compose/pgadmin
-    depends_on:
-      - postgres
-    links:
-      - postgres
-    ports:
-      - "5050:5050"
+# the pgadmin container is not proxied!
+#  pgadmin:
+#    build: ./compose/pgadmin
+#    depends_on:
+#      - postgres
+#    links:
+#      - postgres
+#    ports:
+#      - "5050:5050"
       
   django:
     build:
@@ -30,7 +31,7 @@ services:
       - POSTGRES_DB=gis
       - USE_DOCKER=yes
       - PROJ_LIB=/usr/share/proj
-      - GDAL_DATA=/usr/share/gdal
+      - GDAL_DATA=/usr/share/gdal/1.10
     volumes:
       - .:/app
       - /mnt/volume-sfo2-01/odaa:/data      

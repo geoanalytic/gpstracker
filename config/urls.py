@@ -11,7 +11,9 @@ from django.views import defaults as default_views
 urlpatterns = [
     url(r'^$',         TemplateView.as_view(template_name='pages/home.html'), name='home'),
     url(r'^leaflet/$', TemplateView.as_view(template_name='pages/leaflet.html'), name='leaflet'),
+    url(r'^leaflet_test/$',  TemplateView.as_view(template_name='pages/leaflet_test.html'), name='leaflet'),
     url(r'^cesium/$',  TemplateView.as_view(template_name='pages/cesium.html'), name='cesium'),
+    url(r'^cesium_test/$',  TemplateView.as_view(template_name='pages/cesium_test.html'), name='cesium'),
     url(r'^about/$',   TemplateView.as_view(template_name='pages/about.html'), name='about'),
 
     # Django Admin, use {% url 'admin:index' %}
@@ -23,6 +25,8 @@ urlpatterns = [
 
     # Your stuff: custom urls includes go here
     url(r'^geodata/', include('geodata.urls')),
+    url(r'^rigstreet/', include('rigstreet.urls')),    
+ #   url(r'^proposal/$', TemplateView.as_view(template_name='pages/odaa.html'),name='proposal'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

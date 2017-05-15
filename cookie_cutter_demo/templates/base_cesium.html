@@ -8,7 +8,7 @@
   <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
   <meta name="author" content="GeoAnalytic Inc.">
-  <title>{% block title %}OpenDataAreas Alberta - Cesium{% endblock title %}</title>
+  <title>{% block title %}GeoAnalytic - Cesium{% endblock title %}</title>
   
   {% block css %}  
   <style>
@@ -16,9 +16,28 @@
       html, body, #cesiumContainer {
           width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
       }
+	  .geoanalytic-overlay-item {
+		display: block;  // inline-block;
+		vertical-align: top;
+		margin: 2px 5px;
+		width: 99%;
+		text-align: left;
+		cursor: pointer;
+	  }
+	  .geoanalytic-overlay-itemLabel {
+		display: inline;   // block;
+		font-family: sans-serif;
+		font-size: 10pt;
+		text-align: left;
+		vertical-align: middle;
+		color: #edffff;
+		cursor: pointer;
+		word-wrap: break-word;
+	  }
   </style>
   {% endblock %} 
   <script src="{% static 'Cesium/Cesium.js'  %}"></script>
+  <script src="{% static 'Cesium/viewerCesiumNavigationMixin.min.js' %}"></script>
   
 </head>
 
@@ -31,27 +50,163 @@
   <script>
 	Cesium.BingMapsApi.defaultKey = 'AljFLH_6YezKaiGd34UEx6D-c7E_99nPn7YUADjjxC-uowfxxzn1eqL-VNh-Et7m';
 	Cesium.MapboxApi.defaultAccessToken = 'pk.eyJ1IjoiYmZyYXNlciIsImEiOiJjaXlvdGlyNmgwMDJxMzNwY3U0bHMyaWg3In0.ygo6W32G7HaiVfRkBa2xFQ';
+	var flyto = [
+		{
+		"name": "Alberta",
+		"longitude": -115,
+		"latitude": 54.5,
+		"altitude": 1500000,
+		"heading": 0.0,
+		"pitch": -90,
+		"roll": 0
+		},
+		//   ------ Add New Locations below: ------
+		// (remember: no trailing comma on last entry!)
+		{
+		"name": "Beaver Hills",
+		"longitude": -112.8803,
+		"latitude": 53.4958,
+		"altitude": 80000,
+		"heading": 0.0,
+		"pitch": -90,
+		"roll": 0
+		},
+		{
+		"name": "Fort McMurray",
+		"longitude": -111.0,
+		"latitude": 56.2505,
+		"altitude": 1000,
+		"heading": 0.0,
+		"pitch": -35,
+		"roll": 0
+		},
+		{
+		"name": "Fox Creek",
+		"longitude": -117.5261,
+		"latitude": 54.0193,
+		"altitude": 80000,
+		"heading": 0.0,
+		"pitch": -90,
+		"roll": 0
+		},
+		{
+		"name": "RMH Sylvan",
+		"longitude": -114.5047,
+		"latitude": 52.4498,
+		"altitude": 80000,
+		"heading": 0.0,
+		"pitch": -90,
+		"roll": 0
+		},
+		{
+		"name": "Taber",
+		"longitude": -112.0158,
+		"latitude": 50.7021,
+		"altitude": 80000,
+		"heading": 0.0,
+		"pitch": -90,
+		"roll": 0
+		},
+		{
+		"name": "Utikuma Lake",
+		"longitude": -115.3324,
+		"latitude": 55.9393,
+		"altitude": 80000,
+		"heading": 0.0,
+		"pitch": -90,
+		"roll": 0
+		}
+	];
 
+
+	// ----------------------------------------------------
+	//  Add to the default baseLayers.
+	// ----------------------------------------------------
+	// ------ Imagery Providers: ------
+	var baseImageryLayers = Cesium.createDefaultImageryProviderViewModels();
+	var selectedImageryProvider = 0;
+	
+	baseImageryLayers.push(new Cesium.ProviderViewModel({
+		name : 'ESRI World Topo Map',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/esriWorldTopoMap.png'),
+		tooltip : 'This topographic map is designed to be used as a basemap and a reference map. The map has been compiled by Esri and the ArcGIS user community from a variety of best available sources.',
+		creationFunction : function() {
+			return new Cesium.ArcGisMapServerImageryProvider({
+				url : '//services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer',
+				enablePickFeatures : false
+			});
+		}
+	}));
+	selectedImageryProvider = baseImageryLayers.length-1;  // use this layer as default
+	
+	// ------ Terrain Providers: ------
+	var baseTerrainLayers = Cesium.createDefaultTerrainProviderViewModels();
+	var selectedTerrainProvider = 0;
+	
+	baseTerrainLayers.push(new Cesium.ProviderViewModel({
+		name : 'FtMac',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/TerrainProviders/Airborne.png'),
+		tooltip : 'FtMac LIDAR',
+		creationFunction : function() {
+			return new Cesium.CesiumTerrainProvider({
+				url : '/data/terrains/FortMcMurray_be_geo/'
+			});
+		}
+	}));
+	selectedTerrainProvider = baseTerrainLayers.length-1;  // use this layer as default
+	
+	baseTerrainLayers.push(new Cesium.ProviderViewModel({
+		name : 'Taber',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/TerrainProviders/Airborne.png'),
+		tooltip : 'Taber LIDAR',
+		creationFunction : function() {
+			return new Cesium.CesiumTerrainProvider({
+				url : '/data/terrains/Taber_be_geo_filled2_sub/'
+			});
+		}
+	}));
+	
+	
+	// ----------------------------------------------------
+	// Set inital view and Home button to Alberta: 
+	// ----------------------------------------------------
+	var west = -121.0;
+	var south = 48.0;
+	var east = -109.0;
+	var north = 61.0;
+	var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+	/*
+	viewer.camera.flyTo({
+		destination : rectangle
+	});
+	*/
+	Cesium.Camera.DEFAULT_VIEW_FACTOR = 0;
+	Cesium.Camera.DEFAULT_VIEW_RECTANGLE = rectangle;	
+	
+	// ----------------------------------------------------
+	// Create Cesium View Object: 
+	// ----------------------------------------------------
     var viewer = new Cesium.Viewer('cesiumContainer', {
-        animation:            true,
+        animation:            false,
         baseLayerPicker:      true,
         fullscreenButton:     true,
         vrButton:             false,
-        geocoder:             false,
+        geocoder:             true,
         homeButton:           true,
         infoBox:              true,
         sceneModePicker:      true,
         selectionIndicator:   true,
-        timeline:             true,
+        timeline:             false,
         navigationHelpButton: true,
-        navigationInstructionsInitiallyVisible: true,
+        navigationInstructionsInitiallyVisible: false,
         scene3DOnly:          false,
 		shadows:              false,
 
-//		selectedImageryProviderViewModel 	<object>
-//		imageryProviderViewModels			array of <object>
-//		selectedTerrainProviderViewModel	<object>
-//		terrainProviderViewModels			array of <object>
+        imageryProviderViewModels : baseImageryLayers,
+        selectedImageryProviderViewModel : baseImageryLayers[selectedImageryProvider],
+		terrainProviderViewModels: baseTerrainLayers,
+		selectedTerrainProviderViewModel: baseTerrainLayers[2],
+
 //		imageryProvider						<object>
 //		terrainProvider						<object>
 //		skyBox:               				<object>
@@ -71,58 +226,125 @@
 //		terrainShadows
 //		mapMode2D
 
-        terrainExaggeration:  1.0
+        terrainExaggeration:  1.5
     });
-	//----------------------------------------------------
-	// Custom Terrain
-	//----------------------------------------------------
-	var terrainProvider = new Cesium.CesiumTerrainProvider({
-        url : '/data/terrains/Beaverhills_be_geo/'
-    });	
-    viewer.terrainProvider = terrainProvider;	
-    viewer.scene.globe.enableLighting = true;
+	// ------ Remove default double click behavior -------
+	viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
 	
+	// ----------------------------------------------------
+	// Add Credits: 
+	// ----------------------------------------------------
+	var creditODAA = new Cesium.Credit('Open Data Areas Alberta', Cesium.buildModuleUrl('Widgets/Images/OpenDataAreas-Logo-med-1b.png'), 'http://opendataareas.ca/');
+	viewer.scene.frameState.creditDisplay.addDefaultCredit(creditODAA);
+
+	var creditGeoA = new Cesium.Credit('GeoAnalytic Inc', Cesium.buildModuleUrl('Widgets/Images/geoAclr-trans2-1b.png'), 'http://www.geoanalytic.com/');
+	viewer.scene.frameState.creditDisplay.addDefaultCredit(creditGeoA);
+
+	var creditODAA2 = new Cesium.Credit('Overlay data by Open Data Areas Alberta');
+	viewer.scene.frameState.creditDisplay.addDefaultCredit(creditODAA2);
+
+	var creditGeoA2 = new Cesium.Credit('Customization by GeoAnalytic Inc');
+	viewer.scene.frameState.creditDisplay.addDefaultCredit(creditGeoA2);
+
+
+	// ----------------------------------------------------
+	// Add Navigation Compass and Scale Bar: 
+	// ----------------------------------------------------
+	//https://github.com/alberto-acevedo/cesium-navigation
+	var options = {};
+//	options.defaultResetView = Cesium.Rectangle.fromDegrees(71, 3, 90, 14);
+	// Only the compass will show on the map
+	options.enableCompass= true;
+	options.enableCompassOuterRing= true;
+	options.enableZoomControls= true;
+	options.enableDistanceLegend= true;
+	viewer.extend(Cesium.viewerCesiumNavigationMixin, {});
+	
+// ----------------------------------------------------
+
 	//----------------------------------------------------
-	// Other Imagery, data
+	// Other Imagery, data  (bottom layer first)
 	//----------------------------------------------------
     var imageryLayers = viewer.imageryLayers;
-
-/*
-	// Add a TMS imagery layer
-	imageryLayers.addImageryProvider(new Cesium.createTileMapServiceImageryProvider({
-	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/DIDsPlus@g21',
-	   fileExtension: 'png'
-	}));
-*/
+	var provider;
+	var layer;
 	
-	// Add a WMS imagery layer
-	imageryLayers.addImageryProvider(new Cesium.WebMapServiceImageryProvider({
+	// ------------------- Add an Overlay: -------------------
+	provider = new Cesium.WebMapServiceImageryProvider({
 		url : 'https://webmap.positionbot.com/mapserv/?map=/data/mapfiles/didsplus/didsplus.map&',
 		//                                             this map file is required? for GetFeature
 		layers : 'DIDsPlus',
 		parameters : {
 			map: '/data/mapfiles/didsplus/didsplus.map',
 			transparent : true,
-//			srs : 'EPSG:3857',
 			format : 'image/png'
-	//        service: 'WMS',
-	//        version:"1.1.1", 
-	//        request:"GetMap", 
-	//        styles:""
 		}
-	}));
+	});
+	layer = imageryLayers.addImageryProvider(provider);
+	layer.name = 'DIDs+';
+	layer.show = false;
 	
-	// Add a TMS imagery layer
-	imageryLayers.addImageryProvider(new Cesium.createTileMapServiceImageryProvider({
+	// ------------------- Add an Overlay: -------------------
+	provider = new Cesium.createTileMapServiceImageryProvider({
+	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/AltaLIS_20k@g',
+	   fileExtension: 'png'
+	});
+	layer = imageryLayers.addImageryProvider(provider);
+	layer.name = 'Basemap';
+	layer.show = false;
+	
+	// ------------------- Add an Overlay: -------------------
+	provider = new Cesium.createTileMapServiceImageryProvider({
 	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/Cadastral@g21',
 	   fileExtension: 'png'
-	}));
+	});
+	layer = imageryLayers.addImageryProvider(provider);
+	layer.name = 'Cadastral';
+	layer.show = false;
+	
+	// ------------------- Add an Overlay: -------------------
+	provider = new Cesium.createTileMapServiceImageryProvider({
+	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/Quickbird_2015@g',
+	   fileExtension: 'png'
+	});
+	layer = imageryLayers.addImageryProvider(provider);
+	layer.name = 'Quickbird 2015';
+	layer.show = false;
 
+	// ------------------- Add an Overlay: -------------------
+	provider = new Cesium.createTileMapServiceImageryProvider({
+	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/Quickbird_2012@g',
+	   fileExtension: 'png'
+	});
+	layer = imageryLayers.addImageryProvider(provider);
+	layer.name = 'Quickbird 2012';
+	layer.show = false;
+	
+	// ------------------- Add an Overlay: -------------------
+	provider = new Cesium.createTileMapServiceImageryProvider({
+	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/DLS@g21',
+	   fileExtension: 'png'
+	});
+	layer = imageryLayers.addImageryProvider(provider);
+	layer.name = 'Township System';
+	layer.show = false;
+	
+	// ------------------- Add an Overlay: -------------------
+	provider = new Cesium.createTileMapServiceImageryProvider({
+	   url : 'https://webmap.positionbot.com/mapcache/tms/1.0.0/NTS@g21',
+	   fileExtension: 'png'
+	});
+	layer = imageryLayers.addImageryProvider(provider);
+	layer.name = 'NTS Index';
+	layer.show = false;
+
+
+	// ------------------- Add Point Cloud -------------------
+/*
+*/	
 	var tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
 		url: '/data/entwine/' + 'ftmac-cesium' + '/cesium'
 	}));
-
-	// Add Point Cloud
 	tileset.readyPromise.then(function() {
 		console.log('Loaded tileset');
 		var bounding = tileset._root._boundingVolume;
@@ -134,9 +356,281 @@
 				cart.latitude * (180 / Math.PI),
 				bounding._boundingSphere.radius * 2.2);
 
-		viewer.camera.setView({ destination: dest });
+//		viewer.camera.setView({ destination: dest });
 	});	
+	tileset.name = 'Point Cloud';
+	tileset.show = false;
+//	imageryLayers.push(tileset);
+	var primitives = viewer.scene.primitives;
+
+	// ----------------------------------------------------
+	// Add Controls: 
+	// ----------------------------------------------------
+	var elements = document.getElementsByClassName("cesium-viewer-toolbar");
+	var toolbar;
+	if (elements.length > 0) {
+		toolbar = elements[0];
+		// ----------------------------------------------------
+		// Add Layer Control [Picker]: 
+		// ----------------------------------------------------
+		var dropPanelDismiss = function (){
+			if (dropPanel.className == 'cesium-baseLayerPicker-dropDown cesium-baseLayerPicker-dropDown-visible') {
+				dropPanel.className = 'cesium-baseLayerPicker-dropDown';
+			}
+		};
+		
+		var layerControlButton = document.createElement('button');
+		layerControlButton.type = 'button';
+		layerControlButton.className = 'cesium-button cesium-toolbar-button';
+		layerControlButton.title = 'Overlays';
+		layerControlButton.onclick = function(){
+			if (dropPanel.className == 'cesium-baseLayerPicker-dropDown') {
+				dropPanel.className = 'cesium-baseLayerPicker-dropDown cesium-baseLayerPicker-dropDown-visible'
+			} else {
+				dropPanel.className = 'cesium-baseLayerPicker-dropDown'
+			}
+		};
+		var imgElement = document.createElement('img');
+		imgElement.setAttribute('draggable', 'false');
+		imgElement.src = Cesium.buildModuleUrl('Widgets/Images/layers.png');
+		layerControlButton.appendChild(imgElement);
+		toolbar.appendChild(layerControlButton);
+		
+		// ------ add panel: ------
+		var dropPanel = document.createElement('div');
+		dropPanel.className = 'cesium-baseLayerPicker-dropDown';
+		
+		closeDropPanel = function(e) {
+			if (!(layerControlButton.contains(e.target) || dropPanel.contains(e.target))) {
+				dropPanelDismiss();
+			}
+		};
+		
+		var FeatureDetection = Cesium.FeatureDetection;
+		if (FeatureDetection.supportsPointerEvents()) {
+			document.addEventListener('pointerdown', closeDropPanel, true);
+		} else {
+			document.addEventListener('mousedown',  closeDropPanel, true);
+			document.addEventListener('touchstart', closeDropPanel, true);
+		};
+		
+		toolbar.appendChild(dropPanel);		
+
+		// ------ add title: ------
+		var imageryTitle = document.createElement('div');
+		imageryTitle.className = 'cesium-baseLayerPicker-sectionTitle';
+		imageryTitle.innerHTML = 'Overlays';
+		dropPanel.appendChild(imageryTitle);
+		
+		// ------ add list area: ------
+		var imageryListArea = document.createElement('div');
+		imageryListArea.className = 'cesium-baseLayerPicker-choices';
+		dropPanel.appendChild(imageryListArea);
+			
+/*			
+		// loop over Cesium.ImageryLayerCollection() adding entries for each ImageryLayer (except if isBaseLayer)
+		//  some day will include EntityCollections too?
+		var imageryLayersLength = primitives.length;
+		for (var i = imageryLayersLength-1; i > 0; i--){			
+			var layer = imageryLayers.get(i);
+			if (!layer.isBaseLayer()){
+				var imageryListItem = document.createElement('div');
+				imageryListItem.className = 'geoanalytic-overlay-item';
+				imageryListArea.appendChild(imageryListItem);
+				
+				var imageryLabel = document.createElement('label');
+				imageryLabel.className = 'geoanalytic-overlay-itemLabel';
+				imageryListItem.appendChild(imageryLabel);
+
+				var imageryCheckbox = document.createElement('input');
+				imageryCheckbox.className = 'geoanalytic-overlay-itemLabel';
+				imageryCheckbox.type = 'checkbox';
+				imageryCheckbox.id = i;
+				
+				imageryCheckbox.checked = layer.show
+				imageryCheckbox.onclick = function(){
+					var i = this.id;
+					var layer = primitives.get(i);
+//					console.log('Checkbox clicked: '+ layer.name);
+					layer.show = this.checked;
+				};
+				imageryLabel.appendChild(imageryCheckbox);
+
+				var imageryText = document.createElement('span');
+				imageryText.innerText = layer.name;
+				imageryLabel.appendChild(imageryText);
+
+				imageryListItem.appendChild(imageryLabel);
+			}
+		};			
+*/
+		// loop over Cesium.ImageryLayerCollection() adding entries for each ImageryLayer (except if isBaseLayer)
+		//  some day will include EntityCollections too?
+		var imageryLayersLength = imageryLayers.length;
+		for (var i = imageryLayersLength-1; i > 0; i--){			
+			var layer = imageryLayers.get(i);
+			if (!layer.isBaseLayer()){
+				var imageryListItem = document.createElement('div');
+				imageryListItem.className = 'geoanalytic-overlay-item';
+				imageryListArea.appendChild(imageryListItem);
+				
+				var imageryLabel = document.createElement('label');
+				imageryLabel.className = 'geoanalytic-overlay-itemLabel';
+				imageryListItem.appendChild(imageryLabel);
+
+				var imageryCheckbox = document.createElement('input');
+				imageryCheckbox.className = 'geoanalytic-overlay-itemLabel';
+				imageryCheckbox.type = 'checkbox';
+				imageryCheckbox.id = i;
+				
+				imageryCheckbox.checked = layer.show
+				imageryCheckbox.onclick = function(){
+					var i = this.id;
+					var layer = imageryLayers.get(i);
+//					console.log('Checkbox clicked: '+ layer.name);
+					layer.show = this.checked;
+				};
+				imageryLabel.appendChild(imageryCheckbox);
+
+				var imageryText = document.createElement('span');
+				imageryText.innerText = layer.name;
+				imageryLabel.appendChild(imageryText);
+
+				imageryListItem.appendChild(imageryLabel);
+			}
+		};
+		
+		
+		
+		// ----------------------------------------------------
+		// Add FlyTo Control: 
+		// ----------------------------------------------------
+		var flyToSelection = function(i){
+			viewer.camera.flyTo({
+				destination : Cesium.Cartesian3.fromDegrees(flyto[i].longitude, 
+															flyto[i].latitude,
+															flyto[i].altitude),
+				orientation : {
+					heading : Cesium.Math.toRadians(flyto[i].heading),
+					pitch   : Cesium.Math.toRadians(flyto[i].pitch),
+					roll    : flyto[i].roll
+				}
+			})
+		};
+
+		var flytoDropdown = document.createElement('select');
+		flytoDropdown.className = 'cesium-button';
+		flytoDropdown.id = 'FlyTo';
+		flytoDropdown.onchange = function() {flyToSelection(this.selectedIndex)};
+		toolbar.appendChild(flytoDropdown);
+		
+		for (var i = 0; i < flyto.length; i++){
+			var flytoDropdownOption = document.createElement('option');
+			flytoDropdownOption.text = flyto[i].name;
+			flytoDropdown.appendChild(flytoDropdownOption);     
+		};		
+		
+	}
+	// ----------------------------------------------------
+	// Zoom to Alberta: 
+	// ----------------------------------------------------
+	var west = -121.0;
+	var south = 48.0;
+	var east = -109.0;
+	var north = 61.0;
+	var rectangle = Cesium.Rectangle.fromDegrees(west, south, east, north);
+
+	viewer.camera.flyTo({
+		destination : rectangle
+	});
 	
+	// http://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript#6055620
+	function copyTextToClipboard(text) {
+	  var textArea = document.createElement("textarea");
+	  
+	  //
+	  // *** This styling is an extra step which is likely not required. ***
+	  //
+	  // Why is it here? To ensure:
+	  // 1. the element is able to have focus and selection.
+	  // 2. if element was to flash render it has minimal visual impact.
+	  // 3. less flakyness with selection and copying which **might** occur if
+	  //    the textarea element is not visible.
+	  //
+	  // The likelihood is the element won't even render, not even a flash,
+	  // so some of these are just precautions. However in IE the element
+	  // is visible whilst the popup box asking the user for permission for
+	  // the web page to copy to the clipboard.
+	  //
+
+	  // Place in top-left corner of screen regardless of scroll position.
+	  textArea.style.position = 'fixed';
+	  textArea.style.top = 0;
+	  textArea.style.left = 0;
+
+	  // Ensure it has a small width and height. Setting to 1px / 1em
+	  // doesn't work as this gives a negative w/h on some browsers.
+	  textArea.style.width = '2em';
+	  textArea.style.height = '2em';
+
+	  // We don't need padding, reducing the size if it does flash render.
+	  textArea.style.padding = 0;
+
+	  // Clean up any borders.
+	  textArea.style.border = 'none';
+	  textArea.style.outline = 'none';
+	  textArea.style.boxShadow = 'none';
+
+	  // Avoid flash of white box if rendered for any reason.
+	  textArea.style.background = 'transparent';
+
+
+	  textArea.value = text;
+
+	  document.body.appendChild(textArea);
+
+	  textArea.select();
+
+	  try {
+		var successful = document.execCommand('copy');
+		var msg = successful ? 'successful' : 'unsuccessful';
+		console.log('Copying text command was ' + msg);
+	  } catch (err) {
+		console.log('Oops, unable to copy');
+	  }
+
+	  document.body.removeChild(textArea);
+	};
+
+	document.addEventListener('keydown', function(e) {
+		switch (e.key) {
+		case 'p':
+			var cameraPosition = viewer.camera.positionCartographic;
+			var longitudeString = Cesium.Math.toDegrees(cameraPosition.longitude).toFixed(4);
+			var latitudeString  = Cesium.Math.toDegrees(cameraPosition.latitude).toFixed(5);
+			var heightString    = cameraPosition.height.toFixed(0);
+			var heading         = Cesium.Math.toDegrees(viewer.camera.heading).toFixed(0);
+			var pitch           = Cesium.Math.toDegrees(viewer.camera.pitch).toFixed(0);
+			var roll            = Cesium.Math.toDegrees(viewer.camera.roll).toFixed(0);
+			if (heading == '360') heading = '0';
+			if (roll == '360') roll = '0';
+
+			var copyText =
+					'    {\n' +
+					'    "name": "New Location",\n' +
+					'    "longitude": ' + longitudeString + ',\n' +
+					'    "latitude":  ' + latitudeString  + ',\n' +
+					'    "altitude":  ' + heightString + ',\n' +
+					'    "heading":   ' + heading + ',\n' +
+					'    "pitch":     ' + pitch + ',\n' +
+					'    "roll":      ' + roll + ',\n' +
+					'    },\n'
+	//		alert(copyText);
+			copyTextToClipboard(copyText);
+			break;
+		}
+	}, false);	
+		
 	//----------------------------------------------------
 	// Add basic drag and drop functionality
 	//----------------------------------------------------

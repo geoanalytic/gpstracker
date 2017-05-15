@@ -51,6 +51,7 @@ LOCAL_APPS = (
     # Your stuff: custom apps go here
     'geodata',
     'geobase',
+    'rigstreet',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -260,9 +261,9 @@ ADMIN_URL = r'^admin/'
 # ------------------------------------------------------------------------------
 # Settings for Django-leaflet -- see https://github.com/makinacorpus/django-leaflet
 LEAFLET_CONFIG = {
-    'SPATIAL_EXTENT': (-121, 48, -109, 61),
-#    'DEFAULT_CENTER': (56.7, -111.4),  
-#    'DEFAULT_ZOOM': 10,
+#    'SPATIAL_EXTENT': (-121, 48, -109, 61),  # Limits the panning
+    'DEFAULT_CENTER': (54.5, -115),           # Not as good as SPATIAL_EXTENT since extent varies with brower size
+    'DEFAULT_ZOOM': 5,						  #  good for a phone
     'MIN_ZOOM': 3,
     'MAX_ZOOM': 21,
     'TILES': [('OpenStreetMap', 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {'attribution': '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>', 'maxZoom': 19}),
@@ -274,26 +275,35 @@ LEAFLET_CONFIG = {
 					'Map data {attribution.OpenStreetMap}','maxZoom': 18 })
 					],
     'OVERLAYS': [
+				('NTS Index',      'https://webmap.positionbot.com/mapcache/tms/1.0.0/NTS@g21/{z}/{x}/{y}.png',    {'attribution': 'Data from <a href="http://www.GeoAnalytic.com">GeoAnalytic</a>','maxZoom': 21, 'tms': 'true' }),
+				('Township System',      'https://webmap.positionbot.com/mapcache/tms/1.0.0/DLS@g21/{z}/{x}/{y}.png',    {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 21, 'tms': 'true' }),
 				('Quickbird 2012', 'https://webmap.positionbot.com/mapcache/tms/1.0.0/Quickbird_2012@g/{z}/{x}/{y}.png', {'attribution': 'Image data by <a href="http://digitalglobe.com">DigitalGlobe</a>','maxZoom': 18, 'tms': 'true' }),
 				('Quickbird 2015', 'https://webmap.positionbot.com/mapcache/tms/1.0.0/Quickbird_2015@g/{z}/{x}/{y}.png', {'attribution': 'Image data by <a href="http://digitalglobe.com">DigitalGlobe</a>','maxZoom': 18, 'tms': 'true' }),
-#				('DIDs+',          'https://webmap.positionbot.com//mapserv/?map=/data/mapfiles/didsplus/didsplus.map&', {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 21, 'wms': 'true' }),
-#				('Cadastral',      'https://webmap.positionbot.com/mapcache/tms/1.0.0/Cadastral@g21/{z}/{x}/{y}.png', {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 21, 'tms': 'true' }),
-				('Basemap',        'https://webmap.positionbot.com/mapcache/tms/1.0.0/AltaLIS_20k@g/{z}/{x}/{y}.png', {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 18, 'tms': 'true' })
+				('Cadastral',      'https://webmap.positionbot.com/mapcache/tms/1.0.0/Cadastral@g21/{z}/{x}/{y}.png',    {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 21, 'tms': 'true' }),
+				('Basemap',        'https://webmap.positionbot.com/mapcache/tms/1.0.0/AltaLIS_20k@g/{z}/{x}/{y}.png',    {'attribution': 'Data from <a href="http://altalis.com">AltaLIS</a>','maxZoom': 18, 'tms': 'true' })
 					],
           
     'SCALE': 'both',
     'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
     'MINIMAP': True,
-	'RESET_VIEW' : True,
-#    'NO_GLOBALS' = False,
+	'RESET_VIEW' : False,
+#    'NO_GLOBALS' : False,
 	'PLUGINS': {
 		'MousePosition': {
 			'css':'/static/css/L.Control.MousePosition.css',
 			'js': '/static/js/L.Control.MousePosition.js',
 			'auto-include': True,
 		},
+		
+# https://gist.github.com/alfredotranchedone/72326145ecff5d7d7233
 		'BetterWMS': {
 			'js': '/static/js/L.TileLayer.BetterWMS.js',
+			'auto-include': True,
+		},
+		
+# https://github.com/gmaclennan/leaflet-bing-layer
+		'bing': {
+			'js': '/static/js/leaflet-bing-layer.js',
 			'auto-include': True,
 		},
 	},
